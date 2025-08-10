@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayaan Siddique - Cybersecurity & Blockchain Developer</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS Variables & Reset */
+        :root {
+            --primary-purple: #8B5CF6;
+            --secondary-purple: #A78BFA;
+            --accent-blue: #06B6D4;
+            --accent-pink: #EC4899;
+            --dark-bg: #0D1117;
+            --darker-bg: #010409;
+            --card-bg: rgba(13, 17, 23, 0.95);
+            --card-border: rgba(139, 92, 246, 0.3);
+            --text-primary: #F0F6FC;
+            --text-secondary: #8B949E;
+            --text-muted: #6E7681;
+            --glass-bg: rgba(22, 27, 34, 0.8);
+            --glow-purple: rgba(139, 92, 246, 0.4);
+            --glow-blue: rgba(6, 182, 212, 0.3);
+            --section-padding: 120px;
+            --container-padding: 32px;
+            --border-radius: 24px;
+            --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-duration: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--darker-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Background & Effects */
+        #galaxy-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -2;
+        }
+
+        .galaxy-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 40% 80%, rgba(236, 72, 153, 0.06) 0%, transparent 50%),
+                linear-gradient(180deg, transparent 0%, rgba(1, 4, 9, 0.8) 100%);
+            z-index: -1;
+        }
+
+        .floating-orb {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(139, 92, 246, 0.3), rgba(6, 182, 212, 0.1));
+            filter: blur(1px);
+            animation: float 6s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .floating-orb:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            top: 10%;
+            right: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-orb:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            bottom: 20%;
+            left: 5%;
+            animation-delay: 2s;
+        }
+
+        .floating-orb:nth-child(3) {
+            width: 120px;
+            height: 120px;
+            top: 60%;
+            right: 15%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0px) scale(1); 
+                opacity: 0.7; 
+            }
+            50% { 
+                transform: translateY(-20px) scale(1.1); 
+                opacity: 0.9; 
+            }
+        }
+
+        /* Loading Screen */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--darker-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.8s ease;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(139, 92, 246, 0.3);
+            border-top: 3px solid var(--primary-purple);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 0;
+            background: rgba(13, 17, 23, 0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--card-border);
+            z-index: 1000;
+            transition: all 0.4s var(--transition-smooth);
+        }
+
+        .navbar.scrolled {
+            background: rgba(13, 17, 23, 0.95);
+            padding: 12px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--container-padding);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-purple), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+            letter-spacing: -0.5px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 48px;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-menu li {
+            position: relative;
+        }
+
+        .nav-menu a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            transition: all var(--transition-duration) ease;
+            padding: 8px 16px;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: var(--primary-purple);
+            background: rgba(139, 92, 246, 0.1);
+            transform: translateY(-1px);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all var(--transition-duration) ease;
+            background: transparent;
+            border: none;
+        }
+
+        .mobile-menu-toggle:hover {
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .mobile-menu-toggle span {
+            width: 28px;
+            height: 3px;
+            background: var(--text-primary);
+            margin: 4px 0;
+            transition: var(--transition-duration);
+            border-radius: 2px;
+        }
+
+        .mobile-menu-toggle.active span:nth-child(1) {
+            transform: rotate(-45deg) translate(-9px, 6px);
+        }
+
+        .mobile-menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-menu-toggle.active span:nth-child(3) {
+            transform: rotate(45deg) translate(-8px, -8px);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px var(--container-padding) 80px;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            z-index: 10;
+            position: relative;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 50px;
+            color: var(--secondary-purple);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 32px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 24px rgba(139, 92, 246, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .hero h1 {
+            font-size: clamp(3.5rem, 8vw, 7rem);
+            font-weight: 900;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #FFFFFF 0%, var(--secondary-purple) 40%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+            letter-spacing: -2px;
+            text-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.4rem, 3vw, 2.2rem);
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            font-weight: 600;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-description {
+            font-size: 20px;
+            color: var(--text-secondary);
+            margin-bottom: 48px;
+            line-height: 1.7;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Buttons */
+        .cta-container {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 48px;
+        }
+
+        .btn {
+            padding: 18px 36px;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            transition: all var(--transition-duration) var(--transition-smooth);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-purple), var(--accent-blue));
+            color: white;
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--text-primary);
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: var(--primary-purple);
+            transform: translateY(-3px);
+        }
+
+        /* Sections */
+        .section {
+            padding: var(--section-padding) var(--container-padding);
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 5;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 24px;
+            color: var(--secondary-purple);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .section-title {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 800;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+            line-height: 1.2;
+            letter-spacing: -1px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-description {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Skills Grid */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 32px;
+            margin-top: 80px;
+        }
+
+        .skill-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--card-border);
+            border-radius: var(--border-radius);
+            padding: 48px 32px;
+            text-align: center;
+            transition: all 0.4s var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .skill-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-purple), transparent);
+            opacity: 0;
+            transition: all var(--transition-duration) ease;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 60px rgba(139, 92, 246, 0.25);
+            border-color: var(--primary-purple);
+        }
+
+        .skill-card:hover::before {
+            opacity: 1;
+        }
+
+        .skill-icon {
+            width: 96px;
+            height: 96px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--accent-blue));
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 24px;
+            color: white;
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
+            transition: transform var(--transition-duration) ease;
+        }
+
+        .skill-card:hover .skill-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .skill-card h3 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .skill-card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 16px;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Education Timeline */
+        .education-container {
+            max-width: 1000px;
+            margin: 80px auto 0;
+            position: relative;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 48px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--primary-purple), var(--accent-blue), transparent);
+            border-radius: 2px;
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+        }
+
+        .education-item {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--card-border);
+            border-radius: var(--border-radius);
+            padding: 48px 40px;
+            margin: 0 0 40px 120px;
+            position: relative;
+            transition: all 0.4s var(--transition-smooth);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .education-item::before {
+            content: '';
+            position: absolute;
+            left: -85px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--accent-blue));
+            border-radius: 50%;
+            box-shadow: 0 0 0 6px var(--darker-bg), 0 0 20px rgba(139, 92, 246, 0.4);
+            border: 3px solid var(--darker-bg);
+        }
+
+        .education-item:hover {
+            transform: translateX(20px);
+            box-shadow: 0 16px 48px rgba(139, 92, 246, 0.2);
+            border-color: var(--primary-purple);
+        }
+
+        .education-item h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+            margin-bottom: 12px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .education-item .degree {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .education-item .field {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            font-size: 16px;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .education-item .description {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 20px;
+            font-size: 16px;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .grade-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--accent-blue));
+            color: white;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+        }
+
+        /* Contact Section */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 24px;
+            margin-top: 80px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .social-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 40px 24px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.4s var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .social-card::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.2), transparent 70%);
+            opacity: 0;
+            transition: all 0.4s var(--transition-smooth);
+            transform: translate(-50%, -50%);
+        }
+
+        .social-card:hover::before {
+            width: 300px;
+            height: 300px;
+            opacity: 1;
+        }
+
+        .social-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 60px rgba(139, 92, 246, 0.25);
+            border-color: var(--primary-purple);
+        }
+
+        .social-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+            position: relative;
+            z-index: 1;
+            transition: all var(--transition-duration) ease;
+        }
+
+        .social-card:hover .social-icon {
+            transform: scale(1.1);
+        }
+
+        /* Social Icon Colors */
+        .social-card.linkedin .social-icon { color: #0077B5; }
+        .social-card.github .social-icon { color: #f5f5f5; }
+        .social-card.instagram .social-icon {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .social-card.facebook .social-icon { color: #1877F2; }
+
+        .social-card span {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Scroll Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s var(--transition-smooth);
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--darker-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary-purple), var(--accent-blue));
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--accent-blue), var(--primary-purple));
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            :root {
+                --section-padding: 80px;
+                --container-padding: 20px;
+            }
+
+            .nav-menu {
+                position: fixed;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(13, 17, 23, 0.95);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 20px;
+                border-radius: 0 0 16px 16px;
+                transform: translateY(-100%);
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s var(--transition-smooth);
+                z-index: 999;
+                gap: 20px;
+            }
+
+            .nav-menu.active {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .mobile-menu-toggle {
+                display: flex;
+            }
+
+            .skills-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .education-item {
+                margin: 0 0 32px 80px;
+                padding: 32px 24px;
+            }
+
+            .timeline-line {
+                left: 32px;
+            }
+
+            .education-item::before {
+                left: -56px;
+                width: 20px;
+                height: 20px;
+            }
+
+            .contact-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .floating-orb {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-description,
+            .section-description {
+                font-size: 18px;
+            }
+
+            .cta-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- 3D Background -->
+    <canvas id="galaxy-canvas"></canvas>
+    <div class="galaxy-overlay"></div>
+
+    <!-- Floating Orbs -->
+    <div class="floating-orb"></div>
+    <div class="floating-orb"></div>
+    <div class="floating-orb"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="logo">Ayaan Siddique</div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#skills" class="nav-link">Skills</a></li>
+                <li><a href="#education" class="nav-link">Education</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="mobile-menu-toggle" id="mobileToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content fade-in">
+            <div class="hero-badge">
+                <i class="fas fa-rocket"></i>
+                Available for Opportunities
+            </div>
+            <h1>Ayaan Siddique</h1>
+            <p class="hero-subtitle">Cybersecurity, IoT & Blockchain Specialist</p>
+            <p class="hero-description">
+                Emerging tech professional passionate about transforming the digital landscape through innovative cybersecurity solutions, blockchain technology, and IoT systems.
+            </p>
+            <div class="cta-container">
+                <a href="#contact" class="btn btn-primary">
+                    <span>Let's Connect</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+                <a href="#about" class="btn btn-secondary">
+                    <span>Learn More</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="section-header fade-in">
+            <div class="section-badge">About Me</div>
+            <h2 class="section-title">Crafting Digital Innovation</h2>
+            <p class="section-description">
+                I'm a first-year Bachelor of Engineering student specializing in Cybersecurity, IoT, and Blockchain. Currently developing expertise in Python programming and web development while building the future of secure technology.
+            </p>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="section">
+        <div class="section-header fade-in">
+            <div class="section-badge">My Expertise</div>
+            <h2 class="section-title">Skills & Technologies</h2>
+            <p class="section-description">
+                Specialized in cutting-edge technologies that power tomorrow's digital infrastructure
+            </p>
+        </div>
+        
+        <div class="skills-grid">
+            <div class="skill-card fade-in">
+                <div class="skill-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Cybersecurity</h3>
+                <p>Specialized knowledge in cybersecurity principles, threat analysis, and security protocols to protect digital assets and infrastructure.</p>
+            </div>
+            
+            <div class="skill-card fade-in">
+                <div class="skill-icon">
+                    <i class="fab fa-python"></i>
+                </div>
+                <h3>Python Development</h3>
+                <p>Proficient in Python programming for automation, data analysis, machine learning, and building robust scalable applications.</p>
+            </div>
+            
+            <div class="skill-card fade-in">
+                <div class="skill-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3>Web Development</h3>
+                <p>Creating modern, responsive web applications using HTML, CSS, JavaScript, and contemporary frameworks with best practices.</p>
+            </div>
+            
+            <div class="skill-card fade-in">
+                <div class="skill-icon">
+                    <i class="fas fa-link"></i>
+                </div>
+                <h3>Blockchain Technology</h3>
+                <p>Understanding blockchain principles, smart contracts, DeFi protocols, and decentralized application development.</p>
+            </div>
+            
+            <div class="skill-card fade-in">
+                <div class="skill-icon">
+                    <i class="fas fa-microchip"></i>
+                </div>
+                <h3>IoT Systems</h3>
+                <p>Knowledge of Internet of Things architecture, sensor networks, embedded systems, and connected device ecosystems.</p>
+            </div>
+            
+            <div class="skill-card fade-in">
+                <div class="skill-icon">
+                    <i class="fas fa-network-wired"></i>
+                </div>
+                <h3>Network Engineering</h3>
+                <p>Building expertise in network infrastructure, protocols, system administration, and enterprise-level solutions.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Education Section -->
+    <section id="education" class="section">
+        <div class="section-header fade-in">
+            <div class="section-badge">Academic Journey</div>
+            <h2 class="section-title">Education</h2>
+            <p class="section-description">
+                My educational foundation in technology and computer science
+            </p>
+        </div>
+        
+        <div class="education-container">
+            <div class="timeline-line"></div>
+            
+            <div class="education-item fade-in">
+                <h3>Bearys Institute of Technology</h3>
+                <div class="degree">B.E in Cybersecurity, IoT and Blockchain Technology</div>
+                <div class="field">Computer Science Engineering</div>
+                <div class="description">Currently pursuing first year with focus on emerging technologies, innovation, and building expertise in next-generation computing systems.</div>
+            </div>
+            
+            <div class="education-item fade-in">
+                <h3>Yenepoya Pre University College</h3>
+                <div class="degree">Pre-University Course (PCMC)</div>
+                <div class="field">Computer Science Stream</div>
+                <div class="description">Completed pre-university education with specialization in Physics, Chemistry, Mathematics, and Computer Science.</div>
+                <span class="grade-badge">First Class</span>
+            </div>
+            
+            <div class="education-item fade-in">
+                <h3>Al Saqaf English Medium School</h3>
+                <div class="degree">SSLC - Kerala Board</div>
+                <div class="field">Class 1 to 10 | Kunjathur, Kerala, India</div>
+                <div class="description">Completed secondary education with exceptional performance and strong foundation in mathematics and sciences.</div>
+                <span class="grade-badge">97%</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="section-header fade-in">
+            <div class="section-badge">Get In Touch</div>
+            <h2 class="section-title">Let's Build Something Amazing</h2>
+            <p class="section-description">
+                Always excited to connect with fellow tech enthusiasts, potential collaborators, and industry professionals
+            </p>
+        </div>
+        
+        <div class="contact-grid">
+            <a href="https://www.linkedin.com/in/ayaan-siddique" target="_blank" class="social-card linkedin fade-in" aria-label="LinkedIn Profile">
+                <div class="social-icon">
+                    <i class="fab fa-linkedin-in"></i>
+                </div>
+                <span>LinkedIn</span>
+            </a>
+            
+            <a href="https://github.com/Ayaansiddiq07" target="_blank" class="social-card github fade-in" aria-label="GitHub Profile">
+                <div class="social-icon">
+                    <i class="fab fa-github"></i>
+                </div>
+                <span>GitHub</span>
+            </a>
+            
+            <a href="https://www.instagram.com/cybernetxayaan" target="_blank" class="social-card instagram fade-in" aria-label="Instagram Profile">
+                <div class="social-icon">
+                    <i class="fab fa-instagram"></i>
+                </div>
+                <span>Instagram</span>
+            </a>
+            
+            <a href="https://www.facebook.com/share/19FREA6YbP/" target="_blank" class="social-card facebook fade-in" aria-label="Facebook Profile">
+                <div class="social-icon">
+                    <i class="fab fa-facebook-f"></i>
+                </div>
+                <span>Facebook</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script>
+        // Configuration
+        const CONFIG = {
+            galaxy: {
+                particleCount: 8000,
+                maxRadius: 300,
+                branches: 3,
+                spin: 0.01,
+                colors: {
+                    inner: '#8B5CF6',
+                    middle: '#06B6D4',
+                    outer: '#EC4899'
+                }
+            },
+            planets: [
+                { radius: 20, position: [200, 80, -60], colors: ['#8B5CF6', '#06B6D4'] },
+                { radius: 15, position: [-150, 100, -40], colors: ['#EC4899', '#8B5CF6'] },
+                { radius: 12, position: [120, -80, -50], colors: ['#06B6D4', '#8B5CF6'] }
+            ]
+        };
+
+        // Global variables
+        let scene, camera, renderer, galaxySystem, planetMeshes = [];
+        let mouseX = 0, mouseY = 0, time = 0;
+        let isInitialized = false;
+
+        // Initialize Galaxy System
+        function initGalaxy() {
+            try {
+                scene = new THREE.Scene();
+                scene.fog = new THREE.Fog(0x010409, 50, 1000);
+
+                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1500);
+                camera.position.set(0, 20, 120);
+
+                const canvas = document.getElementById('galaxy-canvas');
+                renderer = new THREE.WebGLRenderer({ 
+                    canvas: canvas,
+                    alpha: true,
+                    antialias: true,
+                    powerPreference: "high-performance"
+                });
+                
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                renderer.setClearColor(0x010409, 1);
+
+                createGalaxy();
+                createPlanets();
+                createStars();
+
+                isInitialized = true;
+                animate();
+            } catch (error) {
+                console.error('Galaxy initialization failed:', error);
+                handleGalaxyError();
+            }
+        }
+
+        function createGalaxy() {
+            const geometry = new THREE.BufferGeometry();
+            const { particleCount, maxRadius, branches, spin } = CONFIG.galaxy;
+            
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+            const sizes = new Float32Array(particleCount);
+
+            const colorInner = new THREE.Color(CONFIG.galaxy.colors.inner);
+            const colorMiddle = new THREE.Color(CONFIG.galaxy.colors.middle);
+            const colorOuter = new THREE.Color(CONFIG.galaxy.colors.outer);
+
+            for (let i = 0; i < particleCount; i++) {
+                const i3 = i * 3;
+                
+                const radius = Math.pow(Math.random(), 0.6) * maxRadius;
+                const spinAngle = radius * spin;
+                const branchAngle = (i % branches) * (Math.PI * 2) / branches;
+                
+                const randomX = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 15;
+                const randomY = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 15;
+                const randomZ = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 15;
+
+                positions[i3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
+                positions[i3 + 1] = randomY * 0.3;
+                positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ;
+
+                const mixedColor = new THREE.Color();
+                const normalizedRadius = radius / maxRadius;
+                
+                if (normalizedRadius < 0.33) {
+                    mixedColor.lerpColors(colorInner, colorMiddle, normalizedRadius * 3);
+                } else if (normalizedRadius < 0.66) {
+                    mixedColor.lerpColors(colorMiddle, colorOuter, (normalizedRadius - 0.33) * 3);
+                } else {
+                    mixedColor.lerpColors(colorOuter, new THREE.Color('#FFFFFF'), (normalizedRadius - 0.66) * 3);
+                }
+
+                colors[i3] = mixedColor.r;
+                colors[i3 + 1] = mixedColor.g;
+                colors[i3 + 2] = mixedColor.b;
+
+                sizes[i] = (1 - normalizedRadius) * 3 + Math.random() * 1.5;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+            const material = new THREE.PointsMaterial({
+                size: 2,
+                sizeAttenuation: true,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8
+            });
+
+            galaxySystem = new THREE.Points(geometry, material);
+            scene.add(galaxySystem);
+        }
+
+        function createPlanets() {
+            CONFIG.planets.forEach((planetConfig, index) => {
+                const geometry = new THREE.SphereGeometry(planetConfig.radius, 24, 24);
+                
+                const material = new THREE.ShaderMaterial({
+                    uniforms: {
+                        time: { value: 0 },
+                        color1: { value: new THREE.Color(planetConfig.colors[0]) },
+                        color2: { value: new THREE.Color(planetConfig.colors[1] || planetConfig.colors[0]) }
+                    },
+                    vertexShader: `
+                        varying vec2 vUv;
+                        void main() {
+                            vUv = uv;
+                            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform float time;
+                        uniform vec3 color1;
+                        uniform vec3 color2;
+                        varying vec2 vUv;
+                        
+                        void main() {
+                            vec2 uv = vUv;
+                            float noise = sin(uv.x * 8.0 + time * 0.5) * 0.5 + 0.5;
+                            vec3 finalColor = mix(color1, color2, noise);
+                            gl_FragColor = vec4(finalColor, 0.9);
+                        }
+                    `,
+                    transparent: true
+                });
+                
+                const planet = new THREE.Mesh(geometry, material);
+                planet.position.set(...planetConfig.position);
+                
+                planetMeshes.push({ 
+                    mesh: planet, 
+                    material, 
+                    baseY: planetConfig.position[1],
+                    rotationSpeed: 0.003 + index * 0.001
+                });
+                
+                scene.add(planet);
+            });
+        }
+
+        function createStars() {
+            const geometry = new THREE.BufferGeometry();
+            const starCount = 3000;
+            
+            const positions = new Float32Array(starCount * 3);
+            const colors = new Float32Array(starCount * 3);
+
+            for (let i = 0; i < starCount; i++) {
+                const i3 = i * 3;
+                
+                positions[i3] = (Math.random() - 0.5) * 1000;
+                positions[i3 + 1] = (Math.random() - 0.5) * 500;
+                positions[i3 + 2] = (Math.random() - 0.5) * 1000;
+
+                colors[i3] = colors[i3 + 1] = colors[i3 + 2] = Math.random() * 0.5 + 0.5;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 1,
+                sizeAttenuation: true,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.6
+            });
+
+            const stars = new THREE.Points(geometry, material);
+            scene.add(stars);
+        }
+
+        function animate() {
+            if (!isInitialized) return;
+            
+            requestAnimationFrame(animate);
+            time += 0.01;
+
+            // Rotate galaxy
+            if (galaxySystem) {
+                galaxySystem.rotation.y += 0.0008;
+                galaxySystem.rotation.x += 0.0003;
+            }
+
+            // Update planets
+            planetMeshes.forEach((planetObj, index) => {
+                if (planetObj.material && planetObj.material.uniforms && planetObj.material.uniforms.time) {
+                    planetObj.material.uniforms.time.value = time;
+                }
+                
+                planetObj.mesh.rotation.y += planetObj.rotationSpeed;
+                planetObj.mesh.position.y = planetObj.baseY + Math.sin(time * 0.5 + index) * 5;
+            });
+
+            // Camera movement
+            const targetX = mouseX * 0.03;
+            const targetY = mouseY * 0.03;
+            
+            camera.position.x += (targetX - camera.position.x) * 0.02;
+            camera.position.y += (targetY - camera.position.y) * 0.02;
+            camera.lookAt(0, 0, 0);
+
+            camera.position.z = 120 + Math.sin(time * 0.1) * 3;
+
+            renderer.render(scene, camera);
+        }
+
+        function handleGalaxyError() {
+            console.log('Using CSS fallback background');
+            const canvas = document.getElementById('galaxy-canvas');
+            if (canvas) canvas.style.display = 'none';
+            
+            document.body.style.background = `
+                radial-gradient(ellipse at 20% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
+                linear-gradient(180deg, #010409 0%, #0D1117 100%)
+            `;
+        }
+
+        // Navigation System
+        class Navigation {
+            constructor() {
+                this.navbar = document.getElementById('navbar');
+                this.navMenu = document.getElementById('navMenu');
+                this.mobileToggle = document.getElementById('mobileToggle');
+                this.navLinks = document.querySelectorAll('.nav-link');
+                this.isMenuOpen = false;
+                this.init();
+            }
+
+            init() {
+                this.setupScrollEffect();
+                this.setupMobileMenu();
+                this.setupSmoothScroll();
+                this.setupActiveLinks();
+            }
+
+            setupScrollEffect() {
+                let ticking = false;
+                window.addEventListener('scroll', () => {
+                    if (!ticking) {
+                        requestAnimationFrame(() => {
+                            if (window.scrollY > 50) {
+                                this.navbar.classList.add('scrolled');
+                            } else {
+                                this.navbar.classList.remove('scrolled');
+                            }
+                            ticking = false;
+                        });
+                        ticking = true;
+                    }
+                });
+            }
+
+            setupMobileMenu() {
+                this.mobileToggle.addEventListener('click', () => {
+                    this.toggleMobileMenu();
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (this.isMenuOpen && !this.navbar.contains(e.target)) {
+                        this.closeMobileMenu();
+                    }
+                });
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && this.isMenuOpen) {
+                        this.closeMobileMenu();
+                    }
+                });
+            }
+
+            toggleMobileMenu() {
+                this.isMenuOpen = !this.isMenuOpen;
+                this.mobileToggle.classList.toggle('active', this.isMenuOpen);
+                this.navMenu.classList.toggle('active', this.isMenuOpen);
+                document.body.style.overflow = this.isMenuOpen ? 'hidden' : '';
+            }
+
+            closeMobileMenu() {
+                this.isMenuOpen = false;
+                this.mobileToggle.classList.remove('active');
+                this.navMenu.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            setupSmoothScroll() {
+                this.navLinks.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const targetId = link.getAttribute('href');
+                        const targetSection = document.querySelector(targetId);
+                        
+                        if (targetSection) {
+                            if (this.isMenuOpen) this.closeMobileMenu();
+                            targetSection.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    });
+                });
+            }
+
+            setupActiveLinks() {
+                const sections = document.querySelectorAll('section[id]');
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const activeLink = document.querySelector(`.nav-link[href="#${entry.target.id}"]`);
+                            this.navLinks.forEach(link => link.classList.remove('active'));
+                            if (activeLink) activeLink.classList.add('active');
+                        }
+                    });
+                }, { rootMargin: '-50% 0px -50% 0px' });
+
+                sections.forEach(section => observer.observe(section));
+            }
+        }
+
+        // Scroll Animations
+        function initScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+            document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+        }
+
+        // Hover Effects
+        function initHoverEffects() {
+            const elements = document.querySelectorAll('.btn, .skill-card, .social-card, .education-item');
+            elements.forEach(element => {
+                element.addEventListener('mouseenter', () => {
+                    if (typeof gsap !== 'undefined') {
+                        gsap.to(element, { scale: 1.02, duration: 0.3, ease: "power2.out" });
+                    }
+                });
+                
+                element.addEventListener('mouseleave', () => {
+                    if (typeof gsap !== 'undefined') {
+                        gsap.to(element, { scale: 1, duration: 0.3, ease: "power2.out" });
+                    }
+                });
+            });
+        }
+
+        // Event Listeners
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX - window.innerWidth / 2) / 30;
+            mouseY = (event.clientY - window.innerHeight / 2) / 30;
+        });
+
+        window.addEventListener('resize', () => {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        });
+
+        // Initialization
+        function initApp() {
+            // Hide loading screen
+            const loading = document.getElementById('loading');
+            loading.classList.add('hidden');
+
+            // Initialize systems
+            initGalaxy();
+            const navigation = new Navigation();
+            initScrollAnimations();
+            initHoverEffects();
+
+            // Hero animations
+            if (typeof gsap !== 'undefined') {
+                gsap.from('.hero-content > *', {
+                    opacity: 0,
+                    y: 30,
+                    duration: 1,
+                    stagger: 0.1,
+                    ease: "power2.out",
+                    delay: 0.2
+                });
+            }
+
+            console.log('Portfolio initialized successfully');
+        }
+
+        // Start initialization when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(initApp, 500);
+            });
+        } else {
+            setTimeout(initApp, 500);
+        }
+    </script>
+</body>
+</html>
